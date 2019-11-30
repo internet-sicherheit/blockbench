@@ -10,12 +10,31 @@ public class MultiChainContainer extends GenericContainer {
     private static final ImageFromDockerfile DOCKERFILE = new ImageFromDockerfile("multichain")
             .withDockerfile(Path.of("src/main/resources/multichain/Dockerfile"));
 
+    private static final String INIT_COMMAND = "multichain-util create chain1 " +
+            "&& multichaind chain1 -port=4711 -rpcport=4712 -rpcallowip=0.0.0.0/0 -rpcuser=foo -rpcpassword=bar";
+    private static final String CONNECT_COMMAND = "multichaind chain1@%s:4711 -port=4711 -rpcport=4712";
+
+    private String connectTo;
+
     public MultiChainContainer() {
         super(DOCKERFILE);
 
         withExposedPorts(4711, 4712);
-        withCommand("sh", "-c", "multichain-util create chain1 " +
-                "&& multichaind chain1 -port=4711 -rpcport=4712 -rpcallowip=0.0.0.0/0 -rpcuser=foo -rpcpassword=bar");
     }
 
+    @Override
+    protected void configure() {
+        super.configure();
+
+        if (connectTo == null) {
+            withCommand("sh", "-c", INIT_COMMAND);
+        } else {
+            withCommand("sh", "-c", String.format(CONNECT_COMMAND, connectTo));
+        }
+    }
+
+    public MultiChainContainer withConnectTo(String connectTo) {
+        this.connectTo = connectTo;
+        return this;
+    }
 }
