@@ -5,12 +5,12 @@ import org.testcontainers.images.builder.ImageFromDockerfile;
 
 import java.nio.file.Path;
 
-public class MultiChainContainer extends GenericContainer {
+public class MultiChainContainer extends GenericContainer<MultiChainContainer> {
 
     private static final ImageFromDockerfile DOCKERFILE = new ImageFromDockerfile("multichain")
             .withDockerfile(Path.of("src/main/resources/multichain/Dockerfile"));
 
-    private static final String INIT_COMMAND = "multichain-util create chain1 " +
+    private static final String INIT_COMMAND = "multichain-util create chain1 -anyone-can-connect=true " +
             "&& multichaind chain1 -port=4711 -rpcport=4712 -rpcallowip=0.0.0.0/0 -rpcuser=foo -rpcpassword=bar";
     private static final String CONNECT_COMMAND = "multichaind chain1@%s:4711 -port=4711 -rpcport=4712";
 

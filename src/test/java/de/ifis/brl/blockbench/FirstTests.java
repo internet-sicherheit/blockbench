@@ -21,7 +21,6 @@ class FirstTests {
                 .withNetworkAliases("slave");
         slave.start();
 
-        assert true;
     }
 
 }
